@@ -1,0 +1,7 @@
+What you'll find here:
+
+A junk audio monitor for viewing the sound level on the microphone &
+making recordings.
+
+Requires 
+mkdir /sdcard/recordings
