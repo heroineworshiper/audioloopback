@@ -1,6 +1,6 @@
 /*
  * Audio Loopback
- * Copyright (C) 2013  Adam Williams <broadcast at earthling dot net>
+ * Copyright (C) 2013-2017  Adam Williams <broadcast at earthling dot net>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,34 +41,89 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Formatter;
 
 public class MainActivity extends WindowBase implements OnSeekBarChangeListener {
+
+	static float minMeterDB = -40;
+	static float maxSliderDB = 12;
+	static float minSliderDB = -12;
+	Paint paint;
+	TextView recordingStatus;
+	Button recordButton;
+	String currentStatus = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		
-        Log.v("MainActivity", "onCreate");			
+        Log.i("MainActivity", "onCreate");
 
-        Loopback.initialize(this);
+        Mane.initialize(this);
         
         setContentView(R.layout.activity_main);
 
+
+		recordingStatus = (TextView)findViewById(R.id.recordStatus);
+		currentStatus = (String)recordingStatus.getText();
+
+
+		recordButton = (Button)findViewById(R.id.record);
+		recordButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+
+				if(!Settings.wantStart && !Settings.isRecording) {
+					// start the mane thread recording to a file
+					Calendar c = Calendar.getInstance();
+
+					Settings.currentRecording = Settings.RECORDING_DIR + Settings.RECORDING_PREFIX +
+							new Formatter().format("%04d_%02d_%02d_%02d_%02d_%02d.wav",
+									c.get(Calendar.YEAR),
+									c.get(Calendar.MONTH) + 1,
+									c.get(Calendar.DAY_OF_MONTH),
+									c.get(Calendar.HOUR_OF_DAY),
+									c.get(Calendar.MINUTE),
+									c.get(Calendar.SECOND)).toString();
+					Settings.wantStart = true;
+					Log.i("", "MainActivity.MainActivity path=" + Settings.currentRecording);
+
+					recordButton.setText("Stop Recording");
+				}
+				else
+					if(!Settings.wantStop && Settings.isRecording)
+					{
+						Settings.wantStop = true;
+						recordButton.setText("Start Recording");
+					}
+			}
+		});
+
+
+
+
         SeekBar sb = (SeekBar)findViewById(R.id.speaker_gain);
         sb.setMax(100);
-        sb.setProgress(gainToSlider(Loopback.speakerGain));
+        sb.setProgress(gainToSlider(Settings.speakerGain));
         sb.setOnSeekBarChangeListener(this);
         
         CheckBox checkBox = (CheckBox)findViewById(R.id.monitor_mic);
-        checkBox.setChecked(Loopback.monitorMic);
+        checkBox.setChecked(Settings.monitorMic);
         checkBox = (CheckBox)findViewById(R.id.reverb);
-        checkBox.setChecked(Loopback.doReverb);
+        checkBox.setChecked(Settings.doReverb);
         checkBox = (CheckBox)findViewById(R.id.use_popup);
-        checkBox.setChecked(Loopback.usePopup);
+        checkBox.setChecked(Settings.usePopup);
+
+
+
 
 		paint = newPaint();
 
@@ -81,16 +136,16 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 		
 		StandOutWindow.closeAll(this, 
 				MeterWindow.class);
-	 	Loopback.activity = this;
+	 	Mane.activity = this;
 	}
 
 	public void onPause()
 	{
 		Log.v("MainActivity", "onPause");
-		Loopback.saveSettings(this);
-		Loopback.activity = null;
+		Settings.saveSettings(this);
+		Mane.activity = null;
 
-		if(Loopback.usePopup) StandOutWindow.show(this, 
+		if(Settings.usePopup) StandOutWindow.show(this, 
 				MeterWindow.class, 
 				StandOutWindow.DEFAULT_ID);
 
@@ -100,8 +155,8 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 	public void onStop()
 	{
 		Log.v("MainActivity", "onStop");
-		Loopback.saveSettings(this);
-		Loopback.activity = null;
+		Settings.saveSettings(this);
+		Mane.activity = null;
 
 		super.onStop();
 	}
@@ -238,7 +293,12 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 
     public void updateGUI()
     {
-    	if(Loopback.monitorMic == false &&
+		if(!currentStatus.equals(recordingStatus.getText()))
+		{
+			recordingStatus.setText(currentStatus);
+		}
+
+    	if(Settings.monitorMic == false &&
     			((CheckBox) findViewById(R.id.monitor_mic)).isChecked())
     	{
     		((CheckBox) findViewById(R.id.monitor_mic)).setChecked(false);
@@ -257,21 +317,21 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 
     	}
     	
-    	if(Loopback.gotPeaks)
+    	if(Mane.gotPeaks)
     	{
-//    		Log.v("MainActivity", "updateGUI " + Loopback.micPeak + " " + Loopback.speakerPeak);
+//    		Log.v("MainActivity", "updateGUI " + Mane.micPeak + " " + Mane.speakerPeak);
     		drawMeter((SurfaceView) findViewById(R.id.in_meter), 
     				paint,
-    				Loopback.micPeak,
-    				Loopback.micPeakLong);
+    				Mane.micPeak,
+    				Mane.micPeakLong);
     		drawMeter((SurfaceView) findViewById(R.id.out_meter), 
     				paint,
-    				Loopback.speakerPeak,
-    				Loopback.speakerPeakLong);
+    				Mane.speakerPeak,
+    				Mane.speakerPeakLong);
     		
 //			Bundle data = new Bundle();
-//			data.putInt("micPeak", Loopback.micPeak);
-//			data.putInt("micPeakLong", Loopback.micPeakLong);
+//			data.putInt("micPeak", Mane.micPeak);
+//			data.putInt("micPeakLong", Mane.micPeakLong);
 //			StandOutWindow.sendData(this, 
 //					MeterWindow.class, 
 //					StandOutWindow.DISREGARD_ID, 
@@ -281,7 +341,7 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 //					StandOutWindow.DISREGARD_ID);
 // 
     		
-    		Loopback.resetPeaks();
+    		Mane.resetPeaks();
     	}
     	
     }
@@ -299,13 +359,13 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
         switch (view.getId()){
 	        	
         case R.id.monitor_mic:
-        	Loopback.monitorMic = 
+        	Settings.monitorMic = 
         		((CheckBox) findViewById(R.id.monitor_mic)).isChecked();
         case R.id.use_popup:
-        	Loopback.usePopup = 
+        	Settings.usePopup = 
         		((CheckBox) findViewById(R.id.use_popup)).isChecked();
         case R.id.reverb:
-        	Loopback.doReverb = 
+        	Settings.doReverb = 
         		((CheckBox) findViewById(R.id.reverb)).isChecked();
         	break;
         }
@@ -314,9 +374,9 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 	@Override
 	public void onProgressChanged(SeekBar arg0, int value, boolean arg2) 
 	{
-		Loopback.speakerGain = sliderToGain(value);
+		Settings.speakerGain = sliderToGain(value);
 //		Log.v("MainActivity", "onProgressChanged: value=" + value + 
-//				" gain=" + Loopback.speakerGain);
+//				" gain=" + Settings.speakerGain);
 	}
 
 	@Override
@@ -330,9 +390,4 @@ public class MainActivity extends WindowBase implements OnSeekBarChangeListener 
 	{
 		
 	}
-    
-	static float minMeterDB = -40;
-	static float maxSliderDB = 12;
-	static float minSliderDB = -12;
-	Paint paint;
 }

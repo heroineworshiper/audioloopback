@@ -81,8 +81,11 @@ public class WindowBase extends Activity implements Runnable {
 	public void run() {
 		while(true)
 		{
-			if(!handler.hasMessages(0)) handler.sendMessage(
+			if(!handler.hasMessages(0))
+			{
+				handler.sendMessage(
 					Message.obtain(handler, 0, this));
+			}
 			
 			
 			try {

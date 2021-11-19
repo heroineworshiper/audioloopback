@@ -37,7 +37,7 @@ public class MeterWindow extends StandOutWindow
 		LayoutInflater inflater = (LayoutInflater) getSystemService(
 				LAYOUT_INFLATER_SERVICE);
 		view = inflater.inflate(R.layout.meter_window, frame, true);
-		Loopback.meterWindow = this;
+		Mane.meterWindow = this;
 	}
 
 	@Override
@@ -46,8 +46,8 @@ public class MeterWindow extends StandOutWindow
 		return new StandOutLayoutParams(id, 
 				300, 
 				60,
-				Loopback.x, 
-				Loopback.y);
+				Settings.x, 
+				Settings.y);
 	}
 
 
@@ -104,12 +104,12 @@ public class MeterWindow extends StandOutWindow
 	public void onMove(int id, Window window, View view, MotionEvent event) 
 	{
 		StandOutLayoutParams params = window.getLayoutParams();
-		Loopback.x = (int) params.x;
-		Loopback.y = (int) params.y;
+		Settings.x = (int) params.x;
+		Settings.y = (int) params.y;
 	}
 	
 	public boolean onClose(int id, Window window) {
-		Loopback.meterWindow = null;
+		Mane.meterWindow = null;
 		
 //		Log.v("MeterWindow", "onClose " + window.getX() + " " + window.getY());
 		return super.onClose(id, window);

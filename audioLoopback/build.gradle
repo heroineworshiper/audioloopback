@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 20
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId "com.AudioLoopback"
-        minSdkVersion 8
-        targetSdkVersion 9
+        minSdkVersion 26
+        targetSdkVersion 29
     }
 
     buildTypes {
@@ -16,9 +16,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     compile project(':standOut')
-    compile 'com.android.support:support-v4:20.0.0'
+//    compile 'com.android.support:support-v4:20.0.0'
 }

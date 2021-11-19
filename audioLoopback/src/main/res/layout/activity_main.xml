@@ -1,83 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<TableLayout android:id="@+id/tableLayout1"
-		android:layout_width="match_parent" android:layout_height="fill_parent"
-		android:shrinkColumns="*" android:stretchColumns="*">
+	<TableLayout
+		android:id="@+id/tableLayout1"
+		android:layout_width="match_parent"
+		android:layout_height="fill_parent"
+		android:shrinkColumns="*"
+		android:stretchColumns="*">
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
 
-			<TextView android:layout_weight="2" android:id="@+id/textView1"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
+			<TextView
+				android:id="@+id/textView4"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
+				android:layout_weight="2"
+				android:text="Source:" />
+		</TableRow>
+
+		<TableRow
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+
+		</TableRow>
+
+		<TableRow
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:id="@+id/textView1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
+				android:layout_weight="2"
 				android:text="Mic level:" />
 		</TableRow>
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
-			<SurfaceView android:id="@+id/in_meter"
-				android:layout_width="match_parent" android:layout_weight="2"
-				android:layout_height="60dp" />
+
+			<SurfaceView
+				android:id="@+id/in_meter"
+				android:layout_width="match_parent"
+				android:layout_height="60dp"
+				android:layout_weight="2" />
 
 		</TableRow>
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="fill_parent">
 
-			<CheckBox android:id="@+id/monitor_mic"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:onClick="onClick" android:text="Monitor Mic" />
+			<CheckBox
+				android:id="@+id/monitor_mic"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onClick"
+				android:text="Monitor Mic" />
 
-			<CheckBox android:id="@+id/reverb" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:onClick="onClick"
+			<CheckBox
+				android:id="@+id/reverb"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onClick"
 				android:text="Reverb" />
 
 		</TableRow>
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="fill_parent">
 
-			<CheckBox android:id="@+id/use_popup"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:onClick="onClick" android:text="Use Popup Meter" />
+			<CheckBox
+				android:id="@+id/use_popup"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onClick"
+				android:text="Use Popup Meter" />
 
 		</TableRow>
-		
-		<TableRow android:layout_margin="10dp" android:layout_width="wrap_content"
-			android:layout_height="fill_parent">
-			<SeekBar android:layout_weight="2" android:id="@+id/speaker_gain"
-				android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+		<TableRow
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_margin="10dp">
+
+			<SeekBar
+				android:id="@+id/speaker_gain"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="2" />
 		</TableRow>
 
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
-			<TextView android:layout_weight="2" android:id="@+id/textView2"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
+
+			<TextView
+				android:id="@+id/textView2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="2"
 				android:text="Speaker level:" />
 		</TableRow>
 
-		<TableRow android:layout_width="wrap_content"
+		<TableRow
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
 
-			<SurfaceView android:id="@+id/out_meter"
-				android:layout_width="match_parent" android:layout_weight="2"
-				android:layout_height="60dp" />
+			<SurfaceView
+				android:id="@+id/out_meter"
+				android:layout_width="match_parent"
+				android:layout_height="60dp"
+				android:layout_weight="2" />
 
 		</TableRow>
+
+		<TableRow
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<Button
+				android:id="@+id/record"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_above="@+id/textView3"
+				android:layout_marginTop="5dp"
+				android:layout_weight="2"
+				android:text="Record" />
+		</TableRow>
+
+
+		<TableRow
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:id="@+id/recordStatus"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="2"
+				android:text="Recorded filename, length" />
+
+		</TableRow>
+
 	</TableLayout>
 
 	<TextView
-	    android:id="@+id/textView3"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentLeft="true"
-                android:lines="2"
-	    android:text=
-"(c) 2013 Adam Williams\nno warranty" />
-
+		android:id="@+id/textView3"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:lines="2"
+		android:text="(c) 2013-2021 Adam Williams\nno warranty" />
 </RelativeLayout>

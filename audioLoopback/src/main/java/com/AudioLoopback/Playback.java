@@ -1,6 +1,6 @@
 /*
  * Audio Loopback
- * Copyright (C) 2013  Adam Williams <broadcast at earthling dot net>
+ * Copyright (C) 2013-2017  Adam Williams <broadcast at earthling dot net>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ public class Playback  extends Thread  {
 	{
 		// minimum buffer size in bytes
 		bufferSize = AudioTrack.getMinBufferSize(
-				Recording.RECORDER_SAMPLERATE,
+				Settings.RECORDER_SAMPLERATE,
 				AudioFormat.CHANNEL_CONFIGURATION_MONO,
 				AudioFormat.ENCODING_PCM_16BIT);
 		Log.v("Playback", "Playback: bufferSize=" + bufferSize);
@@ -43,7 +43,7 @@ public class Playback  extends Thread  {
 	public void run() 
     {
     	
-    	if(Loopback.useMediaPlayer)
+    	if(Settings.useMediaPlayer)
     	{
     	
 //		    StreamProxy proxy = new StreamProxy();
@@ -67,8 +67,8 @@ public class Playback  extends Thread  {
     	{
     		AudioTrack atrack = new AudioTrack(
 //    				AudioManager.STREAM_VOICE_CALL, 
-    				AudioManager.STREAM_MUSIC, 
-    				Recording.RECORDER_SAMPLERATE, 
+    				AudioManager.STREAM_MUSIC,
+					Settings.RECORDER_SAMPLERATE,
 //    				AudioFormat.CHANNEL_CONFIGURATION_STEREO, 
     				AudioFormat.CHANNEL_CONFIGURATION_MONO, 
     				AudioFormat.ENCODING_PCM_16BIT, 
@@ -80,8 +80,8 @@ public class Playback  extends Thread  {
 
     		while(true)
     		{
-    			Loopback.data.waitSize(bufferSize);
-    			Loopback.data.read(wavData, 0, bufferSize);
+    			Mane.data.waitSize(bufferSize);
+    			Mane.data.read(wavData, 0, bufferSize);
     			atrack.write(wavData, 0, bufferSize);
     		}
     		

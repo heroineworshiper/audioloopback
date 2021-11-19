@@ -8,6 +8,7 @@ import java.util.Set;
 import wei.mark.standout.constants.StandOutFlags;
 import wei.mark.standout.ui.Window;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -47,6 +49,11 @@ import android.widget.TextView;
  */
 public abstract class StandOutWindow extends Service {
 	static final String TAG = "StandOutWindow";
+
+// notification is broken in android 11
+    public static final boolean ENABLE_NOTIFICATION = false;
+// the notification channel
+    String CHANNEL_ID ="Channel ID";
 
 	/**
 	 * StandOut window id: You may use this sample id for your first window.
@@ -357,6 +364,7 @@ public abstract class StandOutWindow extends Service {
 	public void onCreate() {
 		super.onCreate();
 
+        createNotificationChannel();
 		mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -659,10 +667,36 @@ public abstract class StandOutWindow extends Service {
 					PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.setLatestEventInfo(c, contentTitle, contentText,
-				contentIntent);
-		return notification;
+
+		Notification.Builder builder = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
+			builder = new Notification.Builder(this, CHANNEL_ID);
+
+			builder.setAutoCancel(false);
+			builder.setTicker("Sound level");
+			builder.setContentTitle(contentTitle);
+			builder.setContentText(contentText);
+			//builder.setSmallIcon(R.drawable.ic_launcher);
+			builder.setContentIntent(contentIntent);
+			builder.setOngoing(true);
+			builder.setNumber(100);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+			{
+				builder.setSubText("This is subtext...");   //API level 16
+				builder.build();
+			}
+
+			Notification notification = builder.getNotification();
+			//manager.notify(11, myNotication);
+			return notification;
+		}
+
+		return null;
+		//Notification notification = new Notification(icon, tickerText, when);
+		//notification.setLatestEventInfo(c, contentTitle, contentText,
+		//		contentIntent);
+		//return notification;
 	}
 
 	/**
@@ -703,10 +737,37 @@ public abstract class StandOutWindow extends Service {
 					PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.setLatestEventInfo(c, contentTitle, contentText,
-				contentIntent);
-		return notification;
+
+		Notification.Builder builder = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
+			builder = new Notification.Builder(this, CHANNEL_ID);
+
+			builder.setAutoCancel(false);
+			builder.setTicker("Sound level");
+			builder.setContentTitle(contentTitle);
+			builder.setContentText(contentText);
+			//builder.setSmallIcon(R.drawable.ic_launcher);
+			builder.setContentIntent(contentIntent);
+			builder.setOngoing(true);
+			builder.setNumber(100);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+			{
+				builder.setSubText("This is subtext...");   //API level 16
+				builder.build();
+			}
+
+			Notification notification = builder.getNotification();
+			//manager.notify(11, myNotication);
+			return notification;
+		}
+
+		return null;
+
+//		Notification notification = new Notification(icon, tickerText, when);
+//		notification.setLatestEventInfo(c, contentTitle, contentText,
+//				contentIntent);
+//		return notification;
 	}
 
 	/**
@@ -1062,6 +1123,26 @@ public abstract class StandOutWindow extends Service {
 		return false;
 	}
 
+
+    private void createNotificationChannel() 
+    {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Notification channel";
+            String description = "Notification channel";
+			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                name, 
+                importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 	/**
 	 * Show or restore a window corresponding to the id. Return the window that
 	 * was shown/restored.
@@ -1116,36 +1197,41 @@ public abstract class StandOutWindow extends Service {
 		// add view to internal map
 		sWindowCache.putCache(id, getClass(), window);
 
-		// get the persistent notification
-		Notification notification = getPersistentNotification(id);
 
-		// show the notification
-		if (notification != null) {
-			notification.flags = notification.flags
-					| Notification.FLAG_NO_CLEAR;
 
-			// only show notification if not shown before
-			if (!startedForeground) {
-				// tell Android system to show notification
-				startForeground(
-						getClass().hashCode() + ONGOING_NOTIFICATION_ID,
-						notification);
-				startedForeground = true;
-			} else {
-				// update notification if shown before
-				mNotificationManager.notify(getClass().hashCode()
-						+ ONGOING_NOTIFICATION_ID, notification);
-			}
-		} else {
-			// notification can only be null if it was provided before
-			if (!startedForeground) {
-				throw new RuntimeException("Your StandOutWindow service must"
-						+ "provide a persistent notification."
-						+ "The notification prevents Android"
-						+ "from killing your service in low"
-						+ "memory situations.");
-			}
-		}
+        if(ENABLE_NOTIFICATION)
+        {
+		    // get the persistent notification
+		    Notification notification = getPersistentNotification(id);
+
+		    // show the notification
+		    if (notification != null) {
+			    notification.flags = notification.flags | 
+					Notification.FLAG_NO_CLEAR;
+
+			    // only show notification if not shown before
+			    if (!startedForeground) {
+				    // tell Android system to show notification
+				    startForeground(
+						    getClass().hashCode() + ONGOING_NOTIFICATION_ID,
+						    notification);
+				    startedForeground = true;
+			    } else {
+				    // update notification if shown before
+				    mNotificationManager.notify(getClass().hashCode()
+						    + ONGOING_NOTIFICATION_ID, notification);
+			    }
+		    } else {
+			    // notification can only be null if it was provided before
+			    if (!startedForeground) {
+				    throw new RuntimeException("Your StandOutWindow service must"
+						    + "provide a persistent notification."
+						    + "The notification prevents Android"
+						    + "from killing your service in low"
+						    + "memory situations.");
+			    }
+		    }
+        }
 
 		focus(id);
 
@@ -1813,10 +1899,13 @@ public abstract class StandOutWindow extends Service {
 		 *            The id of the window.
 		 */
 		public StandOutLayoutParams(int id) {
-			super(200, 200, TYPE_PHONE,
-					StandOutLayoutParams.FLAG_NOT_TOUCH_MODAL
-							| StandOutLayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-					PixelFormat.TRANSLUCENT);
+			super(200, 
+                200, 
+//                TYPE_PHONE,
+                TYPE_APPLICATION_OVERLAY,
+				StandOutLayoutParams.FLAG_NOT_TOUCH_MODAL | 
+					StandOutLayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+				PixelFormat.TRANSLUCENT);
 
 			int windowFlags = getFlags(id);
 
